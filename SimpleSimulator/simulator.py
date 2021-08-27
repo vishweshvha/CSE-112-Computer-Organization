@@ -107,10 +107,12 @@ def RegStore(register, value):
 # overflows, then the overflow flag is set
 # A | opcode (unused 2bits) reg1 reg2 reg3
 def add(reg1, reg2, reg3):
+    RegStore('111', '0000000000000000')
+
     value = binaryToDecimal(RF(reg2)) + binaryToDecimal(RF(reg3))
     if value > 255:
         RegStore('111', '0000000000001000')
-        RegStore(reg1, decimalToBinary(255))
+        RegStore(reg1, decimalToBinary(value))
     else:
         RegStore(reg1, decimalToBinary(value))
 
@@ -119,6 +121,8 @@ def add(reg1, reg2, reg3):
 # 0 is written to reg1 and overflow flag is set.
 # A |opcode (unused 2bits) reg1 reg2 reg3
 def sub(reg1, reg2, reg3):
+    RegStore('111', '0000000000000000')
+
     value = binaryToDecimal(RF(reg2)) - binaryToDecimal(RF(reg3))
     if value < 0:
         RegStore('111', '0000000000001000')
@@ -130,6 +134,8 @@ def sub(reg1, reg2, reg3):
 # Performs reg1 = $Imm where Imm is a 8 bit value.
 # B | opcode(5bits) reg1 immediatevalue(8bits)
 def moveImmediate(reg1, value):
+    RegStore('111', '0000000000000000')
+
     value = binaryToDecimal(value)
     RegStore(reg1, decimalToBinary(value))
 
@@ -138,12 +144,14 @@ def moveImmediate(reg1, value):
 # C | opcode unused(5bits) reg1 reg2
 def moveRegister(reg1, reg2):
     RegStore(reg1, RF(reg2))
-    RegStore('111','0000000000000000')
+    RegStore('111', '0000000000000000')
 
 
 # Loads data from mem_addr into reg1.
 # D | opcode reg1 memory(8bits)
 def load(reg1, value):
+    RegStore('111', '0000000000000000')
+
     mem_addr = binaryToDecimal(value)
     RegStore(reg1, MEM[mem_addr])
 
@@ -151,6 +159,8 @@ def load(reg1, value):
 # Stores data from reg1 to mem_addr.
 # D | opcode reg1 memory(8bits)
 def store(reg1, value):
+    RegStore('111', '0000000000000000')
+
     mem_addr = binaryToDecimal(value)
     MEM[mem_addr] = RF(reg1)
 
@@ -159,13 +169,15 @@ def store(reg1, value):
 # overflows, then the overflow flag is set.
 # A |opcode (unused 2bits) reg1 reg2 reg3
 def mul(reg1, reg2, reg3):
+    RegStore('111', '0000000000000000')
+
     value = binaryToDecimal(RF(reg2)) * binaryToDecimal(RF(reg3))
     if value < 0:
         RegStore('111', '0000000000001000')
         RegStore(reg1, decimalToBinary(0))
     elif value > 255:
         RegStore('111', '0000000000001000')
-        RegStore(reg1, decimalToBinary(255))
+        RegStore(reg1, decimalToBinary(value))
     else:
         RegStore(reg1, decimalToBinary(value))
 
@@ -174,6 +186,8 @@ def mul(reg1, reg2, reg3):
 # in R0 and the remainder in R1.
 # C | opcode unused(5bits) reg1 reg2
 def div(reg1, reg2):
+    RegStore('111', '0000000000000000')
+
     quotient = binaryToDecimal(RF(reg1)) / binaryToDecimal(RF(reg2))
     remainder = binaryToDecimal(RF(reg1)) / binaryToDecimal(RF(reg2))
     RegStore('000', decimalToBinary(quotient))
@@ -184,6 +198,8 @@ def div(reg1, reg2):
 # where $Imm is an 8 bit value.
 # B | opcode(5bits) reg1 immediatevalue(8bits)
 def rightShift(reg1, value):
+    RegStore('111', '0000000000000000')
+
     num = binaryToDecimal(value)
     instruction = RF(reg1)
     instruction = ('0' * num) + instruction[:len(instruction)-num]
@@ -194,6 +210,8 @@ def rightShift(reg1, value):
 # where $Imm is an 8 bit value.
 # B | opcode(5bits) reg1 immediatevalue(8bits)
 def leftShift(reg1, value):
+    RegStore('111', '0000000000000000')
+
     num = binaryToDecimal(value)
     instruction = RF(reg1)
     instruction += ('0' * num)
@@ -205,6 +223,8 @@ def leftShift(reg1, value):
 # Stores the result in reg1.
 # A |opcode (unused 2bits) reg1 reg2 reg3
 def xor(reg1, reg2, reg3):
+    RegStore('111', '0000000000000000')
+
     value1 = binaryToDecimal(RF(reg2))
     value2 = binaryToDecimal(RF(reg3))
     RegStore(reg1, decimalToBinary(value1 ^ value2))
@@ -214,6 +234,8 @@ def xor(reg1, reg2, reg3):
 # Stores the result in reg1.
 # A |opcode (unused 2bits) reg1 reg2 reg3
 def Or(reg1, reg2, reg3):
+    RegStore('111', '0000000000000000')
+
     value1 = binaryToDecimal(RF(reg2))
     value2 = binaryToDecimal(RF(reg3))
     RegStore(reg1, decimalToBinary(value1 | value2))
@@ -223,6 +245,8 @@ def Or(reg1, reg2, reg3):
 # Stores the result in reg1.
 # A |opcode (unused 2bits) reg1 reg2 reg3
 def And(reg1, reg2, reg3):
+    RegStore('111', '0000000000000000')
+
     value1 = binaryToDecimal(RF(reg2))
     value2 = binaryToDecimal(RF(reg3))
     RegStore(reg1, decimalToBinary(value1 & value2))
@@ -232,6 +256,8 @@ def And(reg1, reg2, reg3):
 # Stores the result in reg1.
 # C | opcode unused(5bits) reg1 reg2
 def invert(reg1, reg2):
+    RegStore('111', '0000000000000000')
+
     value1 = RF(reg2)
     value2 = value1.replace('0', 't')
     value2 = value2.replace('1', '0')
@@ -242,6 +268,8 @@ def invert(reg1, reg2):
 # Compares reg1 and reg2 and sets up the FLAGS register.
 # C | opcode unused(5bits) reg1 reg2
 def compare(reg1, reg2):
+    RegStore('111', '0000000000000000')
+
     value1 = binaryToDecimal(RF(reg1))
     value2 = binaryToDecimal(RF(reg2))
     if value1 < value2:
@@ -255,9 +283,9 @@ def compare(reg1, reg2):
 # Jumps to mem_addr, where mem_addr is a memory address.
 # E | opcode unused(3bits) memory(8bits)
 def jmp(value):
-    global PC, FLAGS
+    global PC
     PC = binaryToDecimal(value)
-    FLAGS = '0000000000000000'
+    RegStore('111', '0000000000000000')
 
 
 # Jump to mem_addr if the less than flagis set (less than
@@ -268,7 +296,9 @@ def jlt(value):
     if FLAGS == '0000000000000100':
         global PC
         PC = binaryToDecimal(value)
-    FLAGS = '0000000000000000'
+    else:
+        RegStore('111', '0000000000000000')
+
 
 
 # Jump to mem_addr if the greater than flag is set (greater than
@@ -279,7 +309,8 @@ def jgt(value):
     if FLAGS == '0000000000000010':
         global PC
         PC = binaryToDecimal(value)
-    FLAGS = '0000000000000000'
+    else:
+        RegStore('111', '0000000000000000')
 
 
 # Jump to mem_addr if the equal flag is set (equal flag =
@@ -290,7 +321,8 @@ def je(value):
     if FLAGS == '0000000000000001':
         global PC
         PC = binaryToDecimal(value)
-    FLAGS = '0000000000000000'
+    else:
+        RegStore('111', '0000000000000000')
 
 
 def execute(instruction, PC):
@@ -362,17 +394,14 @@ while PC < len(MEM):
     cycle_number.append(cycle)
     instruction_number.append(PC)
 
-    if instruction[:5] == '00011' or instruction[:5] == '01111' or instruction[:5] == '10000' or instruction[:5] == '10001' or instruction[:5] == '10010':
-        FLAGS = FLAGS
-    else:
-        FLAGS = '0000000000000000'
-
     if instruction[:5] == '10011':
+        RegStore('111', '0000000000000000')
         print(decimalToBinary8(PC) + ' ' + R0 + ' ' + R1 + ' ' + R2 + ' ' + R3 + ' ' + R4 + ' ' + R5 + ' ' + R6 + ' ' + FLAGS)
         break
 
     execute(instruction, PC)
     print(decimalToBinary8(PC) + ' ' + R0 + ' ' + R1 + ' ' + R2 + ' ' + R3 + ' ' + R4 + ' ' + R5 + ' ' + R6 + ' ' + FLAGS)
+
     PC += 1
     cycle += 1
 
